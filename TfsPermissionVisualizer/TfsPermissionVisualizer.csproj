@@ -52,6 +52,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory, Version=3.10.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -367,8 +371,10 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleEntryPoint.cs" />
     <Compile Include="DirectedGraph.cs" />
     <Compile Include="Guids.cs" />
+    <Compile Include="Options.cs" />
     <Compile Include="TfsPermissionGraphGenerator.cs" />
     <Compile Include="TeamProjectScanner.cs" />
     <Compile Include="TfsPermissionVisualizerPackage.cs" />

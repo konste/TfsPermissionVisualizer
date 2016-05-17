@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Bewise")]
 [assembly: AssemblyProduct("TfsPermissionVisualizer")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyCopyright("BitTitan")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]   
 [assembly: ComVisible(false)]     

@@ -1,0 +1,105 @@
+######################################
+#
+# Ignore .suo files in this folder
+#
+*.suo
+
+######################################
+#
+# Ignore VS internal folders
+#
+.vs\
+_ReSharper.Caches\
+
+######################################
+#
+# Ignore packages
+#
+packages\
+
+######################################
+#
+# Ignore NPM modules
+#
+node_modules\
+
+######################################
+#
+# Ignore IntelliJ project files
+#
+.idea\
+
+######################################
+#
+# Ignore git repos
+#
+.git\
+
+######################################
+#
+# Ignore Bower components
+#
+bower_components\
+
+######################################
+#
+# Ignore generated .nuget files
+#
+*.nupkg
+*.nupkg.bak
+
+######################################
+#
+# Ignore generated SharedAssemblyFileVersion.* files
+#
+SharedAssemblyFileVersion.*
+
+######################################
+#
+# Ignore generated MSI files
+#
+*.msi
+
+######################################
+#
+# Ignore generated Unit Testing files
+#
+TestResult.xml
+
+######################################
+#
+# Ignore BitTitan Build Artifacts
+#
+after.Master.sln.targets
+Master.sln
+BuildTools\BitTitan.Common.Dynamic.targets
+
+######################################
+#
+# Ignore generated .disable files
+#
+*.disable
+
+######################################
+#
+# Ignore generated *.generated.cs files
+#
+*.generated.cs
+
+######################################
+#
+# Ignore published websites output
+#
+\_PublishedWebsites\
+
+######################################
+#
+# Ignore output from FrontEnd build
+#
+\_FrontEndBuildOutput\
+
+######################################
+#
+# Ignore VS data files in branch root
+#
+*.VC.db

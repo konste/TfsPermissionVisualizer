@@ -16,7 +16,7 @@ namespace TfsPermissionVisualizer
     public static class TeamProjectScanner
     {
         internal static readonly Dictionary<string, TeamFoundationIdentity> IdToIdentity = new Dictionary<string, TeamFoundationIdentity>();
-        internal static readonly Dictionary<string, TeamFoundationIdentity> DisplayNameToIdentity = new Dictionary<string, TeamFoundationIdentity>();
+        private static readonly Dictionary<string, TeamFoundationIdentity> DisplayNameToIdentity = new Dictionary<string, TeamFoundationIdentity>();
 
         public static void ScanUsers(TfsTeamProjectCollection tfsTeamProjectCollection, ProjectInfo projectInfo)
         {
@@ -40,8 +40,8 @@ namespace TfsPermissionVisualizer
                 if (!currentIdentity.BelongsToProject(projectInfo.Uri))
                     continue;
 
-                TeamProjectScanner.IdToIdentity.Add(currentIdentity.Descriptor.Identifier, currentIdentity);
-                TeamProjectScanner.DisplayNameToIdentity.Add(currentIdentity.DisplayName, currentIdentity);
+                TeamProjectScanner.IdToIdentity[currentIdentity.Descriptor.Identifier] = currentIdentity;
+                TeamProjectScanner.DisplayNameToIdentity[currentIdentity.DisplayName] = currentIdentity;
 
                 //Debug.WriteLine("{0}: Members = {1}, MemberOf = {2}", currentIdentity.DisplayName(), currentIdentity.Members.Length, currentIdentity.MemberOf.Length);
             }
@@ -51,14 +51,17 @@ namespace TfsPermissionVisualizer
         {
             VersionControlServer vcs = tfsTeamProjectCollection.GetService<VersionControlServer>();
             TeamProject[] teamProjects = vcs.GetAllTeamProjects(true);
-            TeamProject teamProject = teamProjects.ToList().First(tp => tp.Name == projectInfo.Name);
+            TeamProject teamProject = teamProjects.ToList().FirstOrDefault(tp => tp.Name == projectInfo.Name);
+            if (teamProject == null)
+                return;
+
             ItemSecurity[] itemSecurityArray = vcs.GetPermissions(new string[] { teamProject.ServerItem }, RecursionType.Full);
 
             foreach (ItemSecurity itemSecurity in itemSecurityArray)
             {
                 string vcsPath = itemSecurity.ServerItem;
                 string vcsPathGraphId = "vcsPath_" + vcsPath;
-                directedGraph.AddNode(vcsPathGraphId, vcsPath, "Version Control Folder", null, "Collapsed");
+                directedGraph.AddNode(vcsPathGraphId, vcsPath, "Version Control Folder", null, "Expanded");
 
                 foreach (AccessEntry accessEntry in itemSecurity.Entries)
                 {
@@ -75,10 +78,6 @@ namespace TfsPermissionVisualizer
                     };
 
                     string accessEntryDescription = string.Join(" ", accessEntryArray);
-                    //string accessEntryGraphId = vcsPathGraphId + "_AccessEntry_" + accessEntryaccessEntryDescription;
-                    //directedGraph.AddNode(accessEntryGraphId, accessEntryaccessEntryDescription, "Access Entry", null, "Expanded", new Tuple<string, string>("MaxWidth", "150"));
-                    //directedGraph.AddLink(vcsPathGraphId, accessEntryGraphId, "Contains");
-
                     string identityDisplayName = accessEntry.IdentityName;
                     TeamProjectScanner.ExpandContainers(vcsPathGraphId /*accessEntryGraphId*/, identityDisplayName, accessEntryDescription, directedGraph);
                 }
@@ -98,7 +97,7 @@ namespace TfsPermissionVisualizer
             string label = identityDisplayName + " " + accessEntryDescription;
             if (identity.IsContainer)
             {
-                directedGraph.AddNode(identityNameGraphId, label, identityCategory, null, groupState, new Tuple<string, string>("MaxWidth", "50"));
+                directedGraph.AddNode(identityNameGraphId, label, identityCategory, null, groupState, new Tuple<string, string>("MaxWidth", "300"));
             }
             else
             {
@@ -224,13 +223,13 @@ namespace TfsPermissionVisualizer
     {
         public static string UniqueDisplayName(this TeamFoundationIdentity identity)
         {
-            return identity.Descriptor.IdentityType == TfsPermissionGraphGenerator.IDENTITY_TYPE_TFS ? identity.DisplayName : identity.UniqueName;
+            return identity.Descriptor.IdentityType == ExtensionMethods.IDENTITY_TYPE_TFS ? identity.DisplayName : identity.UniqueName;
         }
 
-        public static string TeamProjectUri(this TeamFoundationIdentity identity, string projectUri)
+        private static string TeamProjectUri(this TeamFoundationIdentity identity, string projectUri)
         {
             string teamProject = null;
-            if (identity.Descriptor.IdentityType == TfsPermissionGraphGenerator.IDENTITY_TYPE_TFS)
+            if (identity.Descriptor.IdentityType == ExtensionMethods.IDENTITY_TYPE_TFS)
             { 
                 teamProject = identity.GetProperty("Domain").ToString();
             }
@@ -240,7 +239,7 @@ namespace TfsPermissionVisualizer
         public static string Category(this TeamFoundationIdentity identity)
         {
             string category = "Domain";
-            if (identity.Descriptor.IdentityType == TfsPermissionGraphGenerator.IDENTITY_TYPE_TFS)
+            if (identity.Descriptor.IdentityType == ExtensionMethods.IDENTITY_TYPE_TFS)
             {
                 category = "TFS";
             }
@@ -281,5 +280,8 @@ namespace TfsPermissionVisualizer
                     yield return parent;
             }
         }
+
+        private const string IDENTITY_TYPE_TFS = "Microsoft.TeamFoundation.Identity";
+        private const string IDENTITY_TYPE_WINDOWS = "System.Security.Principal.WindowsIdentity";
     }
 }
