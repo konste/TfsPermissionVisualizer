@@ -10,6 +10,8 @@ using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.VersionControl.Common;
+using Microsoft.VisualStudio.Services.Identity;
+using IdentityDescriptor = Microsoft.TeamFoundation.Framework.Client.IdentityDescriptor;
 
 namespace TfsPermissionVisualizer
 {
@@ -21,14 +23,26 @@ namespace TfsPermissionVisualizer
         public static void ScanUsers(TfsTeamProjectCollection tfsTeamProjectCollection, ProjectInfo projectInfo)
         {
             IIdentityManagementService identityManagementService = tfsTeamProjectCollection.GetService<IIdentityManagementService>();
-            string teamProjectAccountName = $"[{projectInfo.Name}]\\Project Valid Users";
-            TeamFoundationIdentity projectUsersIdentity = identityManagementService.ReadIdentity(IdentitySearchFactor.AccountName,
-                teamProjectAccountName,
-                MembershipQuery.Expanded, // Direct gives 20, Expanded gives 111, ExpandedDown gives 111, ExpandedUp gives 0.
+
+            TeamFoundationIdentity[] projectSecurityGroups = identityManagementService.ListApplicationGroups(
+                 projectInfo.Uri, ReadIdentityOptions.None);
+
+            // Get projectValidUsersIdentity Identifier
+            TeamFoundationIdentity projectValidUsersIdentity = projectSecurityGroups
+                 .FirstOrDefault(psg => psg.GetProperty("SpecialType").ToString().Equals("EveryoneApplicationGroup"));
+
+            if (projectValidUsersIdentity == null)
+                return;
+
+            // Expand projectValidUsersIdentity from Identifier to get the list of Members 
+            projectValidUsersIdentity = identityManagementService.ReadIdentity(
+                IdentitySearchFactor.Identifier,
+                projectValidUsersIdentity.Descriptor.Identifier,
+                MembershipQuery.Expanded, // Number of Members: Direct gives 20, Expanded gives 111, ExpandedDown gives 111, ExpandedUp gives 0.
                 ReadIdentityOptions.None);
 
-            // Expand 
-            TeamFoundationIdentity[] projectUsersIdentities = identityManagementService.ReadIdentities(projectUsersIdentity.Members,
+            // Expand projectValidUsersIdentity with Members into collection of identities 
+            TeamFoundationIdentity[] projectUsersIdentities = identityManagementService.ReadIdentities(projectValidUsersIdentity.Members,
                 MembershipQuery.Direct,
                 ReadIdentityOptions.None);
 

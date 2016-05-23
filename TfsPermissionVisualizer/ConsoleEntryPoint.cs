@@ -12,6 +12,7 @@ namespace TfsPermissionVisualizer
 {
     static class ConsoleEntryPoint
     {
+        [STAThread]
         static int Main(string[] args)
         {
             // C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.exe with "/rootsuffix Exp"
@@ -48,7 +49,7 @@ namespace TfsPermissionVisualizer
 
             TfsPermissionGraphGenerator generator = new TfsPermissionGraphGenerator();
             XDocument xDocument = generator.GenerateDependencyGraph(tfsTeamProjectCollection, projectInfoList);
-            string dgmlTempFilePath = (String.IsNullOrEmpty(options.OutputFile)) ? "TfsPoking.dgml" : options.OutputFile;
+            string dgmlTempFilePath = (String.IsNullOrEmpty(options.OutputFile)) ? "TfsPermissionVisualizer.dgml" : options.OutputFile;
             xDocument.Save(dgmlTempFilePath);
             return 0;
         }
