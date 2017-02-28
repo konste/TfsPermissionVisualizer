@@ -8,7 +8,6 @@ using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
-using System.Linq;
 using System.Xml.Linq;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Server;
@@ -34,6 +33,7 @@ namespace TfsPermissionVisualizer
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(Guids.guidTfsPermissionVisualizerPackagePkgString)]
+    [ProvideBindingPath]
     public sealed class TfsPermissionVisualizerPackage : Package
     {
         /// <summary>
